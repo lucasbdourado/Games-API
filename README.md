@@ -2,7 +2,7 @@
 
 **Author:** Lucas Barbosa Dourado - @lucasbdourado
 
-API em desenvolvimento utilizando Java EE 8. API com o objetivo de criar, iniciar e genrenciar jogos de cartas como jogos de pôquer, blackjack, truco, entre outros.
+API em desenvolvimento utilizando Java EE 8. API com o objetivo de criar, iniciar e gerenciar jogos de cartas como jogos de pôquer, blackjack, truco, entre outros.
 
 ## Estrutura do Código
 
