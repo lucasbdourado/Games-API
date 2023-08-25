@@ -10,4 +10,5 @@ Em Breve
 
 ## Customizações futuras
 - [ ] Desenvolver uma aplicação front-end utilizando Angular.js ou Vue.js consumindo informações na API.
+- [ ] Documentar e hospedar endpoints da API
 - [ ] Criar e hospedar preview do projeto.
