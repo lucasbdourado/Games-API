@@ -10,9 +10,9 @@ public interface IGameDAO {
 
     Game read(Long id) throws Exception;
 
-    //Game update(Game game) throws Exception;
+    Game update(Game game) throws Exception;
 
-    //Game delete(Long id) throws Exception;
+    Game delete(Game game) throws Exception;
 
     List<Game> list() throws Exception;
 

@@ -8,6 +8,7 @@ import br.com.lucasbdourado.games.gamesapi.services.IGameService;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,32 +23,103 @@ public class GameResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Game> getGames() throws Exception {
-        return gameService.getAll();
+    public Response getGames() throws Exception {
+        try {
+            List<Game> games = gameService.getAll();
+
+            return Response.ok(games).build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @GET
     @Path("/count")
     @Produces(MediaType.TEXT_PLAIN)
-    public Integer getCount() throws Exception {
-        return gameService.getCount();
+    public Response getCount() throws Exception {
+        try {
+            Integer gamesCount = gameService.getCount();
+
+            return Response.ok(gamesCount).build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
-    @GET
+    @POST
     @Path("/create")
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Game create() throws Exception {
-        Game game = new Game();
-        game.setName("Mesa de Poker 014");
+    public Response create(Game game) throws Exception {
+        try {
+            Game createdGame = gameService.create(game);
 
-        return gameService.create(game);
+            if (createdGame != null) {
+                return Response.status(Response.Status.CREATED).entity(createdGame).build();
+            } else {
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @DELETE
+    @Path("/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response delete(@PathParam("id") Long id) throws Exception {
+        try {
+            Game deletedGame = gameService.delete(id);
+
+            if (deletedGame != null) {
+                return Response.ok(deletedGame).build();
+            } else {
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @GET
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Game show(@PathParam("id") Long id) throws Exception {
-        return gameService.findById(id);
+    public Response show(@PathParam("id") Long id) throws Exception {
+        try {
+            Game game = gameService.findById(id);
+
+            if (game != null) {
+                return Response.ok(game).build();
+            } else {
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PUT
+    @Path("/{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response update(@PathParam("id") Long id, Game game) throws Exception {
+        try {
+            Game updatedGame = gameService.update(id, game);
+
+            if (updatedGame != null) {
+                return Response.ok(updatedGame).build();
+            } else {
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
 }

@@ -14,4 +14,7 @@ public interface IGameService {
 
     Integer getCount() throws Exception;
 
+    Game update(Long id, Game game) throws Exception;
+
+    Game delete(Long id) throws Exception;
 }

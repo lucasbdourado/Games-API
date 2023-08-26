@@ -42,6 +42,15 @@ public class GameDAO implements IGameDAO{
             }
         } catch (SQLException e){
             e.printStackTrace();
+        } finally {
+
+            if(preparedStatement != null && !preparedStatement.isClosed()){
+                preparedStatement.close();
+            }
+
+            if(connection != null && !connection.isClosed()){
+                connection.close();
+            }
         }
 
         return game;
@@ -88,6 +97,71 @@ public class GameDAO implements IGameDAO{
                 preparedStatement.close();
             }
 
+            if(connection != null && !connection.isClosed()){
+                connection.close();
+            }
+        }
+    }
+
+    @Override
+    public Game update(Game game) throws Exception {
+        Connection connection = null;
+
+        PreparedStatement preparedStatement = null;
+
+        try{
+            connection = ConnectionFactory.getConnection();
+
+            String query = "UPDATE games SET name = ? WHERE id = ?";
+
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, game.getName());
+            preparedStatement.setLong(2, game.getId());
+
+            Integer rowsAffected = preparedStatement.executeUpdate();
+
+            if(rowsAffected == 0){
+                throw new SQLException("Erro: Não foi possivel atualizar o registro, tente novamente mais tarde");
+            }
+
+            return game;
+        } catch (Exception e){
+            throw e;
+        }finally {
+
+            if(preparedStatement != null && !preparedStatement.isClosed()){
+                preparedStatement.close();
+            }
+
+            if(connection != null && !connection.isClosed()){
+                connection.close();
+            }
+        }
+    }
+
+    @Override
+    public Game delete(Game game) throws Exception {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+
+        try{
+            connection = ConnectionFactory.getConnection();
+            String query = "DELETE FROM games WHERE id = ?";
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setLong(1, game.getId());
+            Integer rowsAffected = preparedStatement.executeUpdate();
+
+            if(rowsAffected == 0){
+                throw new SQLException("Erro: Não foi possivel deletar o jogo, tente novamente mais tarde.");
+            }
+
+            return game;
+        } catch (Exception e){
+            throw e;
+        }finally {
+            if(preparedStatement != null && !preparedStatement.isClosed()){
+                preparedStatement.close();
+            }
             if(connection != null && !connection.isClosed()){
                 connection.close();
             }
