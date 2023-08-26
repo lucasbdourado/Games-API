@@ -12,10 +12,7 @@ public class Game {
 
     private static long index = 0;
 
-    public Game(String name){
-        this.id = index;
-        this.name = name;
-        index++;
+    public Game(){
     }
 
     public long getId() {
