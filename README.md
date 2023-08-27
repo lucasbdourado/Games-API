@@ -14,3 +14,6 @@ Em Breve
 - [ ] Autenticação do Usuário com entidade mapeada por JPA.
 - [ ] Documentar e hospedar endpoints da API.
 - [ ] Criar e hospedar preview do projeto.
+
+## Preview
+<center><img src="https://github.com/lucasbdourado/Games-API/assets/44330434/ea45ea8a-6fe7-437d-86a0-f0fc2c5dc95f"></center>
