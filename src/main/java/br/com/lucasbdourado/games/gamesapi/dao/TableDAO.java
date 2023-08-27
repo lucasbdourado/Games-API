@@ -1,6 +1,7 @@
 package br.com.lucasbdourado.games.gamesapi.dao;
 
 import br.com.lucasbdourado.games.gamesapi.dao.jdbc.ConnectionFactory;
+import br.com.lucasbdourado.games.gamesapi.domain.CardGame;
 import br.com.lucasbdourado.games.gamesapi.domain.Table;
 
 import java.sql.Connection;
@@ -22,12 +23,13 @@ public class TableDAO implements ITableDAO {
         try {
             connection = ConnectionFactory.getConnection();
 
-            String query = "INSERT INTO games_tables (name, max_players) VALUES (?, ?)";
+            String query = "INSERT INTO games_tables (name, max_players, game) VALUES (?, ?, ?)";
 
             preparedStatement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);
 
             preparedStatement.setString(1, table.getName());
             preparedStatement.setInt(2, table.getPlayersLimit());
+            preparedStatement.setString(3, table.getCardGame());
 
             int rowsAffected  = preparedStatement.executeUpdate();
 
@@ -37,6 +39,7 @@ public class TableDAO implements ITableDAO {
                 if (generatedKeys.next()) {
                     int tableId = generatedKeys.getInt(1);
                     table.setId(tableId);
+                    table.createGame(CardGame.valueOf(table.getCardGame()));
                 } else {
                     throw new SQLException("Erro: A criação falhou, não foi possível obter o ID gerado.");
                 }
@@ -85,6 +88,8 @@ public class TableDAO implements ITableDAO {
                 table.setId(resultSet.getLong("id"));
                 table.setPlayersLimit(resultSet.getInt("max_players"));
                 table.setName(resultSet.getString("name"));
+                table.createGame(CardGame.valueOf(resultSet.getString("game")));
+                table.setCardGame(resultSet.getString("game"));
             }
 
             return table;
@@ -114,12 +119,13 @@ public class TableDAO implements ITableDAO {
         try{
             connection = ConnectionFactory.getConnection();
 
-            String query = "UPDATE games_tables SET name = ?, max_players = ? WHERE id = ?";
+            String query = "UPDATE games_tables SET name = ?, max_players = ?, game = ? WHERE id = ?";
 
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, table.getName());
             preparedStatement.setInt(2, table.getPlayersLimit());
-            preparedStatement.setLong(3, table.getId());
+            preparedStatement.setString(3, String.valueOf(table.getCardGame()));
+            preparedStatement.setLong(4, table.getId());
 
             Integer rowsAffected = preparedStatement.executeUpdate();
 
@@ -198,6 +204,8 @@ public class TableDAO implements ITableDAO {
                 table.setId(resultSet.getLong("id"));
                 table.setPlayersLimit(resultSet.getInt("max_players"));
                 table.setName(resultSet.getString("name"));
+                table.createGame(CardGame.valueOf(resultSet.getString("game")));
+                table.setCardGame(resultSet.getString("game"));
                 tables.add(table);
             }
 

@@ -2,6 +2,7 @@ package br.com.lucasbdourado.games.gamesapi.resources;
 
 import br.com.lucasbdourado.games.gamesapi.dao.TableDAO;
 import br.com.lucasbdourado.games.gamesapi.dao.ITableDAO;
+import br.com.lucasbdourado.games.gamesapi.domain.CardGame;
 import br.com.lucasbdourado.games.gamesapi.domain.Table;
 import br.com.lucasbdourado.games.gamesapi.services.ITableService;
 import br.com.lucasbdourado.games.gamesapi.services.TableService;
@@ -52,6 +53,8 @@ public class TableResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response create(Table table) throws Exception {
+
+        System.out.println(table);
         try {
             Table createdTable = tableService.create(table);
 
@@ -120,5 +123,4 @@ public class TableResource {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
     }
-
 }
