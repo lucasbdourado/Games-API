@@ -1,33 +1,32 @@
 package br.com.lucasbdourado.games.gamesapi.resources;
 
-import br.com.lucasbdourado.games.gamesapi.dao.GameDAO;
-import br.com.lucasbdourado.games.gamesapi.dao.IGameDAO;
-import br.com.lucasbdourado.games.gamesapi.domain.Game;
-import br.com.lucasbdourado.games.gamesapi.services.GameService;
-import br.com.lucasbdourado.games.gamesapi.services.IGameService;
+import br.com.lucasbdourado.games.gamesapi.dao.TableDAO;
+import br.com.lucasbdourado.games.gamesapi.dao.ITableDAO;
+import br.com.lucasbdourado.games.gamesapi.domain.Table;
+import br.com.lucasbdourado.games.gamesapi.services.ITableService;
+import br.com.lucasbdourado.games.gamesapi.services.TableService;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.ArrayList;
 import java.util.List;
 
-@Path("/games")
-public class GameResource {
-    private final IGameService gameService;
+@Path("/tables")
+public class TableResource {
+    private final ITableService tableService;
 
-    public GameResource(){
-          IGameDAO gameDAO = new GameDAO();
-          this.gameService = new GameService(gameDAO);
+    public TableResource(){
+          ITableDAO tableDAO = new TableDAO();
+          this.tableService = new TableService(tableDAO);
     }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getGames() throws Exception {
+    public Response getTables() throws Exception {
         try {
-            List<Game> games = gameService.getAll();
+            List<Table> tables = tableService.getAll();
 
-            return Response.ok(games).build();
+            return Response.ok(tables).build();
         } catch (Exception e) {
             e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
@@ -39,9 +38,9 @@ public class GameResource {
     @Produces(MediaType.TEXT_PLAIN)
     public Response getCount() throws Exception {
         try {
-            Integer gamesCount = gameService.getCount();
+            Integer tablesCount = tableService.getCount();
 
-            return Response.ok(gamesCount).build();
+            return Response.ok(tablesCount).build();
         } catch (Exception e) {
             e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
@@ -52,12 +51,12 @@ public class GameResource {
     @Path("/create")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response create(Game game) throws Exception {
+    public Response create(Table table) throws Exception {
         try {
-            Game createdGame = gameService.create(game);
+            Table createdTable = tableService.create(table);
 
-            if (createdGame != null) {
-                return Response.status(Response.Status.CREATED).entity(createdGame).build();
+            if (createdTable != null) {
+                return Response.status(Response.Status.CREATED).entity(createdTable).build();
             } else {
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
             }
@@ -72,10 +71,10 @@ public class GameResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response delete(@PathParam("id") Long id) throws Exception {
         try {
-            Game deletedGame = gameService.delete(id);
+            Table deletedTable = tableService.delete(id);
 
-            if (deletedGame != null) {
-                return Response.ok(deletedGame).build();
+            if (deletedTable != null) {
+                return Response.ok(deletedTable).build();
             } else {
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
@@ -90,10 +89,10 @@ public class GameResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response show(@PathParam("id") Long id) throws Exception {
         try {
-            Game game = gameService.findById(id);
+            Table table = tableService.findById(id);
 
-            if (game != null) {
-                return Response.ok(game).build();
+            if (table != null) {
+                return Response.ok(table).build();
             } else {
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
@@ -107,12 +106,12 @@ public class GameResource {
     @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response update(@PathParam("id") Long id, Game game) throws Exception {
+    public Response update(@PathParam("id") Long id, Table table) throws Exception {
         try {
-            Game updatedGame = gameService.update(id, game);
+            Table updatedTable = tableService.update(id, table);
 
-            if (updatedGame != null) {
-                return Response.ok(updatedGame).build();
+            if (updatedTable != null) {
+                return Response.ok(updatedTable).build();
             } else {
                 return Response.status(Response.Status.NOT_FOUND).build();
             }

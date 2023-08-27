@@ -1,7 +1,7 @@
 package br.com.lucasbdourado.games.gamesapi.dao;
 
 import br.com.lucasbdourado.games.gamesapi.dao.jdbc.ConnectionFactory;
-import br.com.lucasbdourado.games.gamesapi.domain.Game;
+import br.com.lucasbdourado.games.gamesapi.domain.Table;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -10,10 +10,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GameDAO implements IGameDAO{
+public class TableDAO implements ITableDAO {
 
     @Override
-    public Game create(Game game) throws Exception {
+    public Table create(Table table) throws Exception {
 
         Connection connection = null;
 
@@ -22,11 +22,12 @@ public class GameDAO implements IGameDAO{
         try {
             connection = ConnectionFactory.getConnection();
 
-            String query = "INSERT INTO games (name) VALUES (?)";
+            String query = "INSERT INTO games_tables (name, max_players) VALUES (?, ?)";
 
             preparedStatement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);
 
-            preparedStatement.setString(1, game.getName());
+            preparedStatement.setString(1, table.getName());
+            preparedStatement.setInt(2, table.getPlayersLimit());
 
             int rowsAffected  = preparedStatement.executeUpdate();
 
@@ -34,8 +35,8 @@ public class GameDAO implements IGameDAO{
 
             try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
-                    int gameId = generatedKeys.getInt(1);
-                    game.setId(gameId);
+                    int tableId = generatedKeys.getInt(1);
+                    table.setId(tableId);
                 } else {
                     throw new SQLException("Erro: A criação falhou, não foi possível obter o ID gerado.");
                 }
@@ -53,16 +54,16 @@ public class GameDAO implements IGameDAO{
             }
         }
 
-        return game;
+        return table;
     }
 
     @Override
-    public Game read(Long id) throws Exception {
+    public Table read(Long id) throws Exception {
         Connection connection = null;
 
         PreparedStatement preparedStatement = null;
 
-        Game game = null;
+        Table table = null;
 
         ResultSet resultSet;
 
@@ -70,7 +71,7 @@ public class GameDAO implements IGameDAO{
 
             connection = ConnectionFactory.getConnection();
 
-            String query = "SELECT * FROM games WHERE Id = ?";
+            String query = "SELECT * FROM games_tables WHERE Id = ?";
 
             preparedStatement = connection.prepareStatement(query);
 
@@ -79,13 +80,14 @@ public class GameDAO implements IGameDAO{
             resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()){
-                game = new Game();
+                table = new Table();
 
-                game.setId(resultSet.getLong("id"));
-                game.setName(resultSet.getString("name"));
+                table.setId(resultSet.getLong("id"));
+                table.setPlayersLimit(resultSet.getInt("max_players"));
+                table.setName(resultSet.getString("name"));
             }
 
-            return game;
+            return table;
 
         } catch (Exception e){
 
@@ -104,7 +106,7 @@ public class GameDAO implements IGameDAO{
     }
 
     @Override
-    public Game update(Game game) throws Exception {
+    public Table update(Table table) throws Exception {
         Connection connection = null;
 
         PreparedStatement preparedStatement = null;
@@ -112,11 +114,12 @@ public class GameDAO implements IGameDAO{
         try{
             connection = ConnectionFactory.getConnection();
 
-            String query = "UPDATE games SET name = ? WHERE id = ?";
+            String query = "UPDATE games_tables SET name = ?, max_players = ? WHERE id = ?";
 
             preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setString(1, game.getName());
-            preparedStatement.setLong(2, game.getId());
+            preparedStatement.setString(1, table.getName());
+            preparedStatement.setInt(2, table.getPlayersLimit());
+            preparedStatement.setLong(3, table.getId());
 
             Integer rowsAffected = preparedStatement.executeUpdate();
 
@@ -124,7 +127,7 @@ public class GameDAO implements IGameDAO{
                 throw new SQLException("Erro: Não foi possivel atualizar o registro, tente novamente mais tarde");
             }
 
-            return game;
+            return table;
         } catch (Exception e){
             throw e;
         }finally {
@@ -140,22 +143,22 @@ public class GameDAO implements IGameDAO{
     }
 
     @Override
-    public Game delete(Game game) throws Exception {
+    public Table delete(Table table) throws Exception {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
 
         try{
             connection = ConnectionFactory.getConnection();
-            String query = "DELETE FROM games WHERE id = ?";
+            String query = "DELETE FROM games_tables WHERE id = ?";
             preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setLong(1, game.getId());
+            preparedStatement.setLong(1, table.getId());
             Integer rowsAffected = preparedStatement.executeUpdate();
 
             if(rowsAffected == 0){
                 throw new SQLException("Erro: Não foi possivel deletar o jogo, tente novamente mais tarde.");
             }
 
-            return game;
+            return table;
         } catch (Exception e){
             throw e;
         }finally {
@@ -169,13 +172,13 @@ public class GameDAO implements IGameDAO{
     }
 
     @Override
-    public List<Game> list() throws Exception {
+    public List<Table> list() throws Exception {
 
         Connection connection = null;
 
         PreparedStatement preparedStatement = null;
 
-        List<Game> games = new ArrayList<>();
+        List<Table> tables = new ArrayList<>();
 
         ResultSet resultSet;
 
@@ -183,20 +186,22 @@ public class GameDAO implements IGameDAO{
 
             connection = ConnectionFactory.getConnection();
 
-            String query = "SELECT * FROM games";
+            String query = "SELECT * FROM games_tables";
 
             preparedStatement = connection.prepareStatement(query);
 
             resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()){
-                Game game = new Game();
-                game.setId(resultSet.getLong("id"));
-                game.setName(resultSet.getString("name"));
-                games.add(game);
+                Table table = new Table();
+
+                table.setId(resultSet.getLong("id"));
+                table.setPlayersLimit(resultSet.getInt("max_players"));
+                table.setName(resultSet.getString("name"));
+                tables.add(table);
             }
 
-            return games;
+            return tables;
 
         } catch (Exception e){
 
@@ -227,7 +232,7 @@ public class GameDAO implements IGameDAO{
         try{
             connection = ConnectionFactory.getConnection();
 
-            String query = "SELECT COUNT(*) FROM games";
+            String query = "SELECT COUNT(*) FROM games_tables";
 
             preparedStatement = connection.prepareStatement(query);
 
