@@ -1,5 +1,6 @@
 package br.com.lucasbdourado.games.gamesapi.services;
 
+import br.com.lucasbdourado.games.gamesapi.domain.Player;
 import br.com.lucasbdourado.games.gamesapi.domain.Table;
 
 import java.util.List;
@@ -17,4 +18,6 @@ public interface ITableService {
     Table update(Long id, Table table) throws Exception;
 
     Table delete(Long id) throws Exception;
+
+    Table joinTable(Long id, Player player) throws Exception;
 }

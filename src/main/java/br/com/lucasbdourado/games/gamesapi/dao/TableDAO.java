@@ -1,271 +1,76 @@
 package br.com.lucasbdourado.games.gamesapi.dao;
 
-import br.com.lucasbdourado.games.gamesapi.dao.jdbc.ConnectionFactory;
-import br.com.lucasbdourado.games.gamesapi.domain.CardGame;
+import br.com.lucasbdourado.games.gamesapi.dao.generic.GenericDAO;
 import br.com.lucasbdourado.games.gamesapi.domain.Table;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class TableDAO implements ITableDAO {
 
+    GenericDAO<Table> database;
+
+    public TableDAO(){
+        database = GenericDAO.getInstance();
+    }
+
     @Override
     public Table create(Table table) throws Exception {
-
-        Connection connection = null;
-
-        PreparedStatement preparedStatement = null;
-
-        try {
-            connection = ConnectionFactory.getConnection();
-
-            String query = "INSERT INTO games_tables (name, max_players, game) VALUES (?, ?, ?)";
-
-            preparedStatement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);
-
-            preparedStatement.setString(1, table.getName());
-            preparedStatement.setInt(2, table.getPlayersLimit());
-            preparedStatement.setString(3, table.getCardGame());
-
-            int rowsAffected  = preparedStatement.executeUpdate();
-
-            if(rowsAffected == 0) throw new SQLException("Erro: A criação do jogo falhou, tente novamente mais tarde.");
-
-            try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
-                if (generatedKeys.next()) {
-                    int tableId = generatedKeys.getInt(1);
-                    table.setId(tableId);
-                    table.createGame(CardGame.valueOf(table.getCardGame()));
-                } else {
-                    throw new SQLException("Erro: A criação falhou, não foi possível obter o ID gerado.");
-                }
-            }
-        } catch (SQLException e){
-            e.printStackTrace();
-        } finally {
-
-            if(preparedStatement != null && !preparedStatement.isClosed()){
-                preparedStatement.close();
-            }
-
-            if(connection != null && !connection.isClosed()){
-                connection.close();
-            }
-        }
+        database.add(table.getId(), table);
 
         return table;
     }
 
     @Override
     public Table read(Long id) throws Exception {
-        Connection connection = null;
-
-        PreparedStatement preparedStatement = null;
-
-        Table table = null;
-
-        ResultSet resultSet;
-
         try{
+            Table table = database.get(id);
 
-            connection = ConnectionFactory.getConnection();
-
-            String query = "SELECT * FROM games_tables WHERE Id = ?";
-
-            preparedStatement = connection.prepareStatement(query);
-
-            preparedStatement.setLong(1, id);
-
-            resultSet = preparedStatement.executeQuery();
-
-            while (resultSet.next()){
-                table = new Table();
-
-                table.setId(resultSet.getLong("id"));
-                table.setPlayersLimit(resultSet.getInt("max_players"));
-                table.setName(resultSet.getString("name"));
-                table.createGame(CardGame.valueOf(resultSet.getString("game")));
-                table.setCardGame(resultSet.getString("game"));
-            }
+            if(table == null) throw new Exception("Erro: A mesa não foi encotrada");
 
             return table;
-
         } catch (Exception e){
-
-            throw e;
-
-        }finally {
-
-            if(preparedStatement != null && !preparedStatement.isClosed()){
-                preparedStatement.close();
-            }
-
-            if(connection != null && !connection.isClosed()){
-                connection.close();
-            }
+            throw new Exception("Erro ao realizar a busca");
         }
     }
 
     @Override
-    public Table update(Table table) throws Exception {
-        Connection connection = null;
+    public Table update(Table updateTable, Table table) throws Exception {
+        try {
+            updateTable.setName(table.getName());
+            updateTable.setCardGame(table.getCardGame());
 
-        PreparedStatement preparedStatement = null;
-
-        try{
-            connection = ConnectionFactory.getConnection();
-
-            String query = "UPDATE games_tables SET name = ?, max_players = ?, game = ? WHERE id = ?";
-
-            preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setString(1, table.getName());
-            preparedStatement.setInt(2, table.getPlayersLimit());
-            preparedStatement.setString(3, String.valueOf(table.getCardGame()));
-            preparedStatement.setLong(4, table.getId());
-
-            Integer rowsAffected = preparedStatement.executeUpdate();
-
-            if(rowsAffected == 0){
-                throw new SQLException("Erro: Não foi possivel atualizar o registro, tente novamente mais tarde");
+            if(table.getGame() != null) {
+                updateTable.setGame(table.getGame());
             }
 
-            return table;
+            return updateTable;
         } catch (Exception e){
-            throw e;
-        }finally {
-
-            if(preparedStatement != null && !preparedStatement.isClosed()){
-                preparedStatement.close();
-            }
-
-            if(connection != null && !connection.isClosed()){
-                connection.close();
-            }
+            throw new Exception("Erro ao atualizar a Mesa");
         }
     }
 
     @Override
     public Table delete(Table table) throws Exception {
-        Connection connection = null;
-        PreparedStatement preparedStatement = null;
 
-        try{
-            connection = ConnectionFactory.getConnection();
-            String query = "DELETE FROM games_tables WHERE id = ?";
-            preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setLong(1, table.getId());
-            Integer rowsAffected = preparedStatement.executeUpdate();
+        if(database.remove(table.getId())) return table;
 
-            if(rowsAffected == 0){
-                throw new SQLException("Erro: Não foi possivel deletar o jogo, tente novamente mais tarde.");
-            }
-
-            return table;
-        } catch (Exception e){
-            throw e;
-        }finally {
-            if(preparedStatement != null && !preparedStatement.isClosed()){
-                preparedStatement.close();
-            }
-            if(connection != null && !connection.isClosed()){
-                connection.close();
-            }
-        }
+        return null;
     }
 
     @Override
-    public List<Table> list() throws Exception {
-
-        Connection connection = null;
-
-        PreparedStatement preparedStatement = null;
-
+    public List<Table> list() {
         List<Table> tables = new ArrayList<>();
 
-        ResultSet resultSet;
-
-        try{
-
-            connection = ConnectionFactory.getConnection();
-
-            String query = "SELECT * FROM games_tables";
-
-            preparedStatement = connection.prepareStatement(query);
-
-            resultSet = preparedStatement.executeQuery();
-
-            while (resultSet.next()){
-                Table table = new Table();
-
-                table.setId(resultSet.getLong("id"));
-                table.setPlayersLimit(resultSet.getInt("max_players"));
-                table.setName(resultSet.getString("name"));
-                table.createGame(CardGame.valueOf(resultSet.getString("game")));
-                table.setCardGame(resultSet.getString("game"));
-                tables.add(table);
-            }
-
-            return tables;
-
-        } catch (Exception e){
-
-            throw e;
-
-        }finally {
-
-            if(preparedStatement != null && !preparedStatement.isClosed()){
-                preparedStatement.close();
-            }
-
-            if(connection != null && !connection.isClosed()){
-                connection.close();
-            }
+        for (Table table: database.getAll().values()) {
+            tables.add(table);
         }
+
+        return tables;
     }
 
     @Override
-    public Integer count() throws Exception {
-        Connection connection = null;
-
-        PreparedStatement preparedStatement = null;
-
-        Integer quantity = 0;
-
-        ResultSet resultSet;
-
-        try{
-            connection = ConnectionFactory.getConnection();
-
-            String query = "SELECT COUNT(*) FROM games_tables";
-
-            preparedStatement = connection.prepareStatement(query);
-
-            resultSet = preparedStatement.executeQuery();
-
-            if (resultSet.next()){
-
-                quantity = resultSet.getInt(1);
-            }
-
-            return quantity;
-
-        } catch (Exception e){
-
-            throw e;
-
-        }finally {
-
-            if(preparedStatement != null && !preparedStatement.isClosed()){
-                preparedStatement.close();
-            }
-
-            if(connection != null && !connection.isClosed()){
-                connection.close();
-            }
-        }
+    public Integer count() {
+        return database.getAll().size();
     }
 }

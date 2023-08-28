@@ -21,7 +21,7 @@ public class Deck {
     public void shuffle(){
 
         for(int i=0; i<cards.size(); i++){
-            int random = (int) ((Math.random() * 52));
+            int random = (int) ((Math.random() * cards.size()));
 
             Card oldCard = cards.get(i);
             Card newCard = cards.get(random);

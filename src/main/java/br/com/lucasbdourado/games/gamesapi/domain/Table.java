@@ -1,11 +1,15 @@
 package br.com.lucasbdourado.games.gamesapi.domain;
 
 
+import br.com.lucasbdourado.games.gamesapi.annotation.PrimaryKey;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 @JsonSerialize
-public class Table {
+public class Table implements Persistent{
 
+    private static Integer index = 1;
+
+    @PrimaryKey("getId")
     private long id;
 
     private String name;
@@ -16,9 +20,12 @@ public class Table {
 
     private String cardGame;
 
+    private Player player;
+
     public Table(){}
 
     public Table(String name, Integer playersLimit, String cardGame){
+        this.id = index++;
         this.name = name;
         this.playersLimit = playersLimit;
         this.cardGame = cardGame;

@@ -10,11 +10,11 @@ public interface ITableDAO {
 
     Table read(Long id) throws Exception;
 
-    Table update(Table table) throws Exception;
+    Table update(Table updateTable, Table table) throws Exception;
 
     Table delete(Table table) throws Exception;
 
-    List<Table> list() throws Exception;
+    List<Table> list();
 
-    Integer count() throws Exception;
+    Integer count();
 }
