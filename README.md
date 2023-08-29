@@ -10,8 +10,8 @@ Em Breve
 
 ## Customizações futuras
 - [ ] Desenvolver uma aplicação front-end utilizando Angular.js ou Vue.js consumindo informações na API.
-- [ ] Utilização de memória RAM para gerenciamento e armazenamento das Mesas/Salas.
-- [ ] Autenticação do Usuário com entidade mapeada por JPA.
+- [X] Utilização de memória RAM para gerenciamento e armazenamento das Mesas/Salas.
+- [X] Autenticação do Usuário.
 - [ ] Documentar e hospedar endpoints da API.
 - [ ] Criar e hospedar preview do projeto.
 
